@@ -1,6 +1,6 @@
 const router = require('express').Router();
-let Excercise = require('../exercise.model');
-let Movies  = require('../movies.model')
+let Excercise = require('../models/exercise.model');
+let Movies  = require('../models/movies.model')
 router.route('/').get((req, res) => {
 
     const getmovies = async () => {

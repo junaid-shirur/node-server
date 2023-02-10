@@ -31,15 +31,15 @@ app.use(bodyParser.json());
 
 connectDB()
 
-const exerciseRouter = require('./models/routes/exercises');
-const userRouter = require('./models/routes/user');
-const movieRouter = require('./models/routes/movies');
-
+const exerciseRouter = require('./routes/exercises');
+const userRouter = require('./routes/user');
+const movieRouter = require('./routes/movies');
+const imageCollectionRouter = require('./routes/imageCollection')
 
 app.use('/api/exercise', exerciseRouter);
 app.use('/api/users', userRouter);
 app.use('/api/getmovies', movieRouter);
-
+app.use('/api/images', imageCollectionRouter);
 
 app.listen(port, () => {
   console.log(`app listening on port ${port}`)

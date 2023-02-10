@@ -1,11 +1,18 @@
 const router = require('express').Router();
-let User = require('../user.model');
+let User = require('../models/user.model');
 const bcrypt = require ('bcrypt');
-const { generateAccessToken, generateRefreshToken, validateToken } = require('../../auth/authService');
+const { generateAccessToken, generateRefreshToken, validateToken } = require('../auth/authService');
+
+
+// router.route('/').get(validateToken,(req, res) => {
+//     // console.log(req);
+//     return false
+// })
+
 // get all users
 router.route('/').get((req, res) => {
-    User.find()
-        .then(users => res.json(users))
+    User.findById(req.user.id)
+        .then(user => res.json(user))
         .catch(err => console.log(err))
 })
 // add user
@@ -44,28 +51,22 @@ router.route('/:id').put((req, res) => {
 
 
 router.route('/login').post(async (req, res) => {
-    console.log(req);
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.header('Access-Control-Allow-Credentials', true);
+
     const user = await User.collection.findOne({ "userName": req.body.username })
-    // console.log(user);
-    const isValid = await bcrypt.compare(req.body.password, user?.password)
+    
+    const isValid = user?.password ? await bcrypt.compare(req.body.password, user?.password) : false
     //check to see if the user exists in the list of registered usersif (user == null) res.status(404).send ("User does not exist!")
     if (isValid) {
-        const accessToken = generateAccessToken({ user: req.body.name })
-        const refreshToken = generateRefreshToken({ user: req.body.name })
+        const accessToken = generateAccessToken({ user: req.body.name, id: user._id })
+        const refreshToken = generateRefreshToken({ user: req.body.name, id: user._id })
 
-        // res.setHeader('Set-Cookies', [
-        //     `accessToken=${accessToken};path=/;secure;httpOnly`,
-        //     `refreshToken=${refreshToken};path=/;secure;httpOnly`
-        // ])
+        // ToDo: set accessToken and refreshToken in cookies 
         res.cookie('accessToken',accessToken)
         res.cookie('refreshToken',refreshToken)
-
         // res.redirect('/users/me')
         res.json({ accessToken: accessToken, refreshToken: refreshToken })
     } else {
-        res.status(401).send("Password Incorrect!")
+        res.status(401).send("Password or username is Incorrect!")
     }
 })
 
