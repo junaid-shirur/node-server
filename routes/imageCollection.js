@@ -2,11 +2,9 @@ const router = require('express').Router();
 let Images = require('../models/imageCollections.model');
 
 router.route('/').get((req, res) => {
-    console.log(req.params);
-    return Images.find({ user_id: 'password123' })
-        .then(user => {
-            console.log(user),
-                res.json(user)
+    return Images.find({ user_id: 'password' })
+        .then(images => {
+                res.json(images)
         })
         .catch(err => console.log(err))
 })
@@ -28,6 +26,30 @@ router.route('/add').post((req, res) => {
             msg: 'image add successfully'
         });
     })
+})
+
+router.route('/delete').delete((req, res) => {
+    Images.deleteMany({ "_id": { "$in": req.body } }, (err, resp) => {
+        if (err) return res.status(400).send({ success: false, err });
+        if (resp.deletedCount == 0) return res.status(500).send({ success: false, msg: 'could not find selected images' })
+        return res.status(200).send({ success: true, msg: 'delete image successfull' })
+    })
+})
+
+router.route('/fav').post((req, res) => {
+    const { imgIds, add } = req.body
+    console.log(imgIds, add );
+    Images.updateMany({
+        "_id": { "$in": imgIds }
+    },
+        { "$set": { favourite: add ? true : false } },
+        { upsert: true },
+        (err, resp) => {
+            if (err) return res.status(400).send({ success: false, err });
+            if (resp.matchedCount == 0) return res.status(500).send({ success: false, msg: 'could not find selected images' })
+            console.log(resp, 'resp');
+            return res.status(200).send({ success: true, msg: resp.modifiedCount + 'images added to the favourites' })
+        })
 })
 
 module.exports = router

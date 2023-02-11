@@ -25,6 +25,9 @@ const imageSchema = new Schema({
         type: String,
         trim: true,
     },
+    favourite: {
+        type: Boolean,
+    },
 }, {
     timestamps: true
 })
