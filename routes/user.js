@@ -79,4 +79,12 @@ router.route('/refreshToken').post(async (req, res) => {
     const refreshToken = generateRefreshToken({ user: req.body.name })
     res.json({ accessToken: accessToken, refreshToken: refreshToken })
 })
+
+router.route('/logout').get(async (req, res) => {
+
+    res.cookie('accessToken', '', { maxAge: 0 })
+    res.cookie('refreshToken', '', { maxAge: 0 })
+    res.send('user logged out')
+})
+
 module.exports = router

@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { validateToken } = require('../auth/authService');
 let Images = require('../models/imageCollections.model');
 
 router.route('/').get((req, res) => {
@@ -38,7 +39,6 @@ router.route('/delete').delete((req, res) => {
 
 router.route('/fav').post((req, res) => {
     const { imgIds, add } = req.body
-    console.log(imgIds, add );
     Images.updateMany({
         "_id": { "$in": imgIds }
     },
